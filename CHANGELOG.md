@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.3] - 2026-06-09
+
+### Changed
+
+- Updated Twilio OpenAPI specs from 2.6.7 to 2.6.9.
+- Added generated services and resources for Conversations v2,
+  Intelligence v3, Knowledge v2, Memory v1, and Voice v3 APIs.
+
 ### Fixed
 
 - Service generator now merges caller-supplied `opts` into the
