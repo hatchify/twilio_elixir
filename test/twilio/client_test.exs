@@ -137,6 +137,45 @@ defmodule Twilio.ClientTest do
     end
   end
 
+  describe "request/4 — legacy generated opts" do
+    test "merges nested caller opts while preserving explicit params", %{client: client} do
+      Twilio.Test.stub(fn _method, url, headers, body ->
+        assert String.starts_with?(url, "http://localhost:4567/")
+        refute url =~ "api.twilio.com"
+
+        assert {"content-type", "application/json"} =
+                 List.keyfind(headers, "content-type", 0)
+
+        assert {"i-twilio-idempotency-token", "test-token"} =
+                 List.keyfind(headers, "i-twilio-idempotency-token", 0)
+
+        decoded = JSON.decode!(body)
+        assert decoded["Name"] == "from-arg"
+        refute decoded["Name"] == "from-opts"
+
+        {201, [{"x-twilio-request-id", "RQ123"}], ~s({"sid": "SM123"})}
+      end)
+
+      assert {:ok, data, response} =
+               Client.request(client, :post, "/test.json",
+                 params: %{"Name" => "from-arg"},
+                 opts: [
+                   base_url: "http://localhost:4567",
+                   content_type: :json,
+                   idempotency_token: "test-token",
+                   params: %{"Name" => "from-opts"},
+                   return_response: true
+                 ],
+                 base_url: "https://api.twilio.com",
+                 content_type: :form
+               )
+
+      assert data["sid"] == "SM123"
+      assert response.status == 201
+      assert response.request_id == "RQ123"
+    end
+  end
+
   describe "request/4 — region/edge" do
     test "applies region to base URL" do
       Twilio.Test.stub(fn _method, url, _headers, _body ->

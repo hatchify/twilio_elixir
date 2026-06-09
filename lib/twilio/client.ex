@@ -114,6 +114,8 @@ defmodule Twilio.Client do
   @spec request(t(), atom(), String.t(), keyword()) ::
           {:ok, map()} | {:ok, map(), map()} | :ok | {:error, Twilio.Error.t()}
   def request(%__MODULE__{} = client, method, path, opts \\ []) do
+    opts = normalize_request_opts(opts)
+
     params = Keyword.get(opts, :params, %{})
     base_url = Keyword.get(opts, :base_url, "https://api.twilio.com")
     content_type = Keyword.get(opts, :content_type, :form)
@@ -177,6 +179,25 @@ defmodule Twilio.Client do
   end
 
   # --- Private ---
+
+  defp normalize_request_opts(opts) do
+    case Keyword.pop(opts, :opts) do
+      {nested_opts, opts} when is_list(nested_opts) ->
+        opts
+        |> Keyword.merge(nested_opts)
+        |> restore_explicit_params(opts)
+
+      _ ->
+        opts
+    end
+  end
+
+  defp restore_explicit_params(merged_opts, opts) do
+    case Keyword.fetch(opts, :params) do
+      {:ok, params} -> Keyword.put(merged_opts, :params, params)
+      :error -> merged_opts
+    end
+  end
 
   defp do_request(client, url, headers, body, attempt, ctx) do
     %{method: method, max_retries: max_retries} = ctx

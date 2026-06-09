@@ -5,6 +5,21 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Fixed
+
+- Service generator now merges caller-supplied `opts` into the
+  `Client.request/4` call. Previously, generated service modules passed the
+  caller's `opts` as a nested `opts:` key that `Client.request/4` never read,
+  and hardcoded `base_url: "https://api.twilio.com"` so the caller's
+  `:base_url` could not take effect. `Client.request/4` now also supports that
+  legacy generated shape, so existing generated services honor caller-supplied
+  `:base_url` (for local test simulators, sandbox/staging hosts, and
+  self-hosted Twilio-compatible proxies), `:content_type`, and other request
+  options without requiring regeneration. The explicit `params` argument
+  continues to win over any `:params` key in `opts`.
+
 ## [0.1.2] - 2026-04-16
 
 ### Changed
