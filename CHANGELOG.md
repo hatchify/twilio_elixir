@@ -7,6 +7,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.4-hatchify.1] - 2026-09-03
+
+This release is published from the `hatchify/twilio_elixir` fork. It holds
+upstream release 0.1.3 plus the fix below, which is proposed upstream.
+
+### Fixed
+
+- `Client.request/4` now encodes a list value as a repeated plain key
+  (`StatusCallbackEvent=initiated&StatusCallbackEvent=ringing`) in form bodies
+  and query strings, which is how the Twilio API and its official SDKs handle
+  array parameters such as `StatusCallbackEvent` and `MediaUrl`. Previously a
+  list encoded as a bracketed key (`StatusCallbackEvent[]=`), which Twilio
+  ignores, so those parameters silently fell back to their defaults. A `nil`
+  element of a list is now dropped instead of sent as an empty value.
+
 ## [0.1.3] - 2026-06-09
 
 ### Changed
