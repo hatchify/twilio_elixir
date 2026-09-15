@@ -276,12 +276,12 @@ defmodule Twilio.Client do
             finch_method,
             url,
             headers,
-            body,
-            receive_timeout: client.read_timeout,
-            pool_timeout: client.open_timeout
+            body
           )
 
-        Finch.request(req, client.finch)
+        opts = [receive_timeout: client.read_timeout, pool_timeout: client.open_timeout]
+
+        Finch.request(req, client.finch, opts)
     end
   end
 

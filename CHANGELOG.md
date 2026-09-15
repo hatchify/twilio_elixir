@@ -7,6 +7,44 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.4-hatchify.2] - 2026-09-15
+
+This release is published from the `hatchify/twilio_elixir` fork. It holds
+release 0.1.4-hatchify.1 plus the change below. The fix is the one that
+upstream pull request
+[jeffhuen/twilio_elixir#7](https://github.com/jeffhuen/twilio_elixir/pull/7)
+proposes for issue
+[#6](https://github.com/jeffhuen/twilio_elixir/issues/6), taken unchanged so
+that the fork carries no variant of it and the patch drops out when upstream
+merges. The fork releases it because that pull request is open and the defect
+stops every request.
+
+### Fixed
+
+- `Client.request/4` no longer raises `ArgumentError` on Finch 0.20 and later.
+  The client passed `:receive_timeout` and `:pool_timeout` to `Finch.build/5`,
+  whose options are `:unix_socket` and `:pool_tag` only. Finch validates them
+  with `Keyword.validate!/2`, so every request raised
+  `unknown keys [:pool_timeout, :receive_timeout]` rather than reaching the
+  API. The two timeouts now go to `Finch.request/3`, which is what applies
+  them.
+
+### Added
+
+- `Twilio.ClientFinchTest` performs one request over a real socket with no
+  stub installed. Every other client test registers a stub with
+  `Twilio.Test.stub/1` and therefore answers before Finch builds anything, so
+  no test covered the Finch path. This one fails with the previous code and
+  passes with the current code.
+
+### Changed
+
+- The lock file moves from Finch 0.21.0 to 0.23.0. The package requires
+  `~> 0.19`, so a consumer is free to resolve a later Finch than the lock
+  named, and the defect above appears only on the versions that validate
+  build options. Testing against the current Finch is what reports it.
+
+
 ## [0.1.4-hatchify.1] - 2026-09-03
 
 This release is published from the `hatchify/twilio_elixir` fork. It holds
