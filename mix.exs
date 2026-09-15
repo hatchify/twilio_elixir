@@ -2,7 +2,7 @@ defmodule Twilio.MixProject do
   use Mix.Project
 
   @source_url "https://github.com/jeffhuen/twilio_elixir"
-  @version "0.1.4-hatchify.1"
+  @version "0.1.4-hatchify.2"
 
   def project do
     [
