@@ -112,6 +112,10 @@ defmodule Twilio.Client do
     * `:max_retries` - Override client max_retries for this request
     * `:return_response` - Return `{:ok, data, response}` with metadata
     * `:idempotency_token` - Custom idempotency token for POST requests
+    * `:headers` - Extra request headers as `{name, value}` tuples. They are
+      appended after the headers the client builds, so a later duplicate of a
+      built name wins with servers that read the last value. Use them for a
+      header the API takes per request, such as `Prefer` against a mock server
   """
   @spec request(t(), atom(), String.t(), keyword()) ::
           {:ok, map()} | {:ok, map(), map()} | :ok | {:error, Twilio.Error.t()}
@@ -124,9 +128,14 @@ defmodule Twilio.Client do
     max_retries = Keyword.get(opts, :max_retries, client.max_retries)
     return_response = Keyword.get(opts, :return_response, false)
     idempotency_token = Keyword.get(opts, :idempotency_token)
+    extra_headers = Keyword.get(opts, :headers, [])
 
     url = resolve_url(base_url, client, method, path, params)
-    headers = build_headers(client, method, content_type, max_retries, idempotency_token)
+
+    headers =
+      build_headers(client, method, content_type, max_retries, idempotency_token) ++
+        extra_headers
+
     body = encode_body(method, params, content_type)
     product = Twilio.Telemetry.product_from_base_url(base_url)
 
