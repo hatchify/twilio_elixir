@@ -7,6 +7,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.5-hatchify.1] - 2026-09-16
+
+This release is published from the `hatchify/twilio_elixir` fork. It holds
+release 0.1.4-hatchify.2 plus the addition below. No upstream proposal carries
+it: the consumer that needs it is the fork's own, and the option changes the
+public behavior of `Client.request/4` rather than fixing a defect.
+
+### Added
+
+- `Client.request/4` accepts `:headers`, a list of `{name, value}` request
+  headers that the client appends after the headers it builds. A caller that
+  needs a per-request header the SDK does not model can now send one. The
+  first use is `Prefer: example=<name>` against a Prism mock server, which
+  selects which example response the mock answers with. The headers reach the
+  `Twilio.Test` stub too, so a test asserts on what the caller sent.
+
 ## [0.1.4-hatchify.2] - 2026-09-15
 
 This release is published from the `hatchify/twilio_elixir` fork. It holds

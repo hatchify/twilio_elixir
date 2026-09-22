@@ -182,6 +182,50 @@ defmodule Twilio.ClientTest do
     end
   end
 
+  describe "request/4 — extra headers" do
+    test "appends the given headers after the built ones", %{client: client} do
+      Twilio.Test.stub(fn _method, _url, headers, _body ->
+        assert {"prefer", "example=compliant"} = List.keyfind(headers, "prefer", 0)
+        assert {"authorization", _auth} = List.keyfind(headers, "authorization", 0)
+        assert List.last(headers) == {"prefer", "example=compliant"}
+
+        {200, [], ~s({"ok": true})}
+      end)
+
+      assert {:ok, _} =
+               Client.request(client, :get, "/test.json",
+                 base_url: "https://api.twilio.com",
+                 headers: [{"prefer", "example=compliant"}]
+               )
+    end
+
+    test "sends every given header", %{client: client} do
+      Twilio.Test.stub(fn _method, _url, headers, _body ->
+        assert {"prefer", "code=500"} = List.keyfind(headers, "prefer", 0)
+        assert {"x-test-run", "7"} = List.keyfind(headers, "x-test-run", 0)
+
+        {200, [], ~s({"ok": true})}
+      end)
+
+      assert {:ok, _} =
+               Client.request(client, :get, "/test.json",
+                 base_url: "https://api.twilio.com",
+                 headers: [{"prefer", "code=500"}, {"x-test-run", "7"}]
+               )
+    end
+
+    test "sends only the built headers when the option is absent", %{client: client} do
+      Twilio.Test.stub(fn _method, _url, headers, _body ->
+        assert List.keyfind(headers, "prefer", 0) == nil
+
+        {200, [], ~s({"ok": true})}
+      end)
+
+      assert {:ok, _} =
+               Client.request(client, :get, "/test.json", base_url: "https://api.twilio.com")
+    end
+  end
+
   describe "request/4 — legacy generated opts" do
     test "merges nested caller opts while preserving explicit params", %{client: client} do
       Twilio.Test.stub(fn _method, url, headers, body ->
