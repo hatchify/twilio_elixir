@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.5-hatchify.2] - 2026-10-19
+
+This release is published from the `hatchify/twilio_elixir` fork. It holds
+release 0.1.5-hatchify.1 plus the fix below.
+
 ### Fixed
 
 - `Twilio.Api.V2010.KeyService.create/3` now returns
