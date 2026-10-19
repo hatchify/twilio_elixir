@@ -64,7 +64,7 @@ defmodule Twilio.Api.V2010.SigningKeyService do
   | `FriendlyName` | string | A descriptive string that you create to describe the resource. It can be up to 64 characters long. |
   """
   @spec create(Client.t(), map(), keyword()) ::
-          {:ok, Twilio.Resources.Api.V2010.SigningKey.t()}
+          {:ok, Twilio.Resources.Api.V2010.NewSigningKey.t()}
           | {:ok, map(), map()}
           | :ok
           | {:error, Twilio.Error.t()}
@@ -79,7 +79,7 @@ defmodule Twilio.Api.V2010.SigningKeyService do
              base_url: "https://api.twilio.com",
              content_type: :form
            ) do
-      {:ok, Deserializer.deserialize(data, Twilio.Resources.Api.V2010.SigningKey)}
+      {:ok, Deserializer.deserialize(data, Twilio.Resources.Api.V2010.NewSigningKey)}
     end
   end
 

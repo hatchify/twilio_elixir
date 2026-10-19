@@ -90,7 +90,7 @@ defmodule Twilio.Verify.V2.Service.Entity.FactorService do
   | `Metadata` | string | Custom metadata associated with the factor. This is added by the Device/SDK directly to allow for the inclusion of device information. It must be a stringified JSON with only strings values eg. `{"os": "Android"}`. Can be up to 1024 characters in length. |
   """
   @spec create(Client.t(), String.t(), String.t(), map(), keyword()) ::
-          {:ok, Twilio.Resources.Verify.V2.Service.Entity.Factor.t()}
+          {:ok, Twilio.Resources.Verify.V2.Service.Entity.NewFactor.t()}
           | {:ok, map(), map()}
           | :ok
           | {:error, Twilio.Error.t()}
@@ -105,7 +105,7 @@ defmodule Twilio.Verify.V2.Service.Entity.FactorService do
              base_url: "https://verify.twilio.com",
              content_type: :form
            ) do
-      {:ok, Deserializer.deserialize(data, Twilio.Resources.Verify.V2.Service.Entity.Factor)}
+      {:ok, Deserializer.deserialize(data, Twilio.Resources.Verify.V2.Service.Entity.NewFactor)}
     end
   end
 

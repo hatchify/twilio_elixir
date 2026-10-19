@@ -77,7 +77,7 @@ defmodule Twilio.Iam.V1.GetApiKeysService do
   | `Policy` | string | The \`Policy\` object is a collection that specifies the allowed Twilio permissions for the restricted key. For more information on the permissions available with restricted API keys, refer to the [Twilio documentation](https://www.twilio.com/docs/iam/api-keys/restricted-api-keys#permissions-available-with-restricted-api-keys). |
   """
   @spec create(Client.t(), map(), keyword()) ::
-          {:ok, Twilio.Resources.Iam.V1.GetApiKeys.t()}
+          {:ok, Twilio.Resources.Iam.V1.NewKey.t()}
           | {:ok, map(), map()}
           | :ok
           | {:error, Twilio.Error.t()}
@@ -89,7 +89,7 @@ defmodule Twilio.Iam.V1.GetApiKeysService do
              base_url: "https://iam.twilio.com",
              content_type: :form
            ) do
-      {:ok, Deserializer.deserialize(data, Twilio.Resources.Iam.V1.GetApiKeys)}
+      {:ok, Deserializer.deserialize(data, Twilio.Resources.Iam.V1.NewKey)}
     end
   end
 

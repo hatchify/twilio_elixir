@@ -58,7 +58,101 @@ defmodule Twilio.Generator.OpenAPI do
     instance_only =
       build_instance_only_resources(instance_paths, list_paths, schemas, product, version)
 
-    resources ++ instance_only
+    resolve_response_resources(resources ++ instance_only, schemas, product, version)
+  end
+
+  # An operation can answer with a schema that has fields its resource lacks.
+  # For example, `CreateNewKey` answers with `api.v2010.account.new_key`, which
+  # holds the `secret` that `api.v2010.account.key` does not. Such an operation
+  # gets `:response_module`, the resource built from its own schema, so that
+  # its answer keeps every field. When no resource of the spec is built from
+  # that schema, a response-only resource is added for it, with the nesting of
+  # the resource whose operation returns it. A response-only resource has no
+  # service.
+  defp resolve_response_resources(resources, schemas, product, version) do
+    built =
+      resources
+      |> Enum.filter(&(&1.properties != []))
+      |> Enum.reduce(%{}, &Map.put_new(&2, &1.schema_name, &1))
+
+    added =
+      for resource <- resources,
+          op <- resource.operations,
+          schema_name <- [lossy_response_schema(op, resource, schemas)],
+          schema_name != nil and not Map.has_key?(built, schema_name) do
+        {schema_name, resource, op.operation_id}
+      end
+      |> Enum.group_by(&elem(&1, 0))
+      |> Enum.sort()
+      |> Enum.map(fn {schema_name, [{_, owner, _} | _] = uses} ->
+        response_resource(schema_name, owner, Enum.map(uses, &elem(&1, 2)), schemas)
+      end)
+
+    reject_name_collisions(resources, added)
+
+    modules =
+      Map.new(Map.values(built) ++ added, fn target ->
+        {target.schema_name,
+         Naming.resource_module(product, version, target.name, target.nesting)}
+      end)
+
+    resolved =
+      Enum.map(resources, fn resource ->
+        operations =
+          Enum.map(resource.operations, &put_response_module(&1, resource, schemas, modules))
+
+        %{resource | operations: operations}
+      end)
+
+    resolved ++ added
+  end
+
+  defp put_response_module(op, resource, schemas, modules) do
+    case lossy_response_schema(op, resource, schemas) do
+      nil -> op
+      schema_name -> Map.put(op, :response_module, Map.fetch!(modules, schema_name))
+    end
+  end
+
+  # The schema an operation answers with, when its resource lacks a field of
+  # that schema and deserializing the answer into the resource would drop it.
+  defp lossy_response_schema(%{name: :list}, _resource, _schemas), do: nil
+
+  defp lossy_response_schema(%{response_schema: nil}, _resource, _schemas), do: nil
+
+  defp lossy_response_schema(op, resource, schemas) do
+    kept = MapSet.new(resource.properties, & &1.name)
+
+    if Enum.any?(extract_properties(op.response_schema, schemas), &(&1.name not in kept)) do
+      op.response_schema
+    end
+  end
+
+  defp response_resource(schema_name, owner, operation_ids, schemas) do
+    %{
+      name: schema_name |> String.split(".") |> List.last() |> Naming.camelize(),
+      nesting: owner.nesting,
+      description: "The answer of #{Enum.map_join(operation_ids, ", ", &"`#{&1}`")}.",
+      operations: [],
+      properties: extract_properties(schema_name, schemas),
+      schema_name: schema_name,
+      schema_description: extract_schema_description(schema_name, schemas),
+      sid_prefix: extract_sid_prefix(schema_name, schemas),
+      parent: owner.parent,
+      dependent_properties: %{},
+      response_only: true
+    }
+  end
+
+  defp reject_name_collisions(resources, added) do
+    taken = MapSet.new(resources, &{&1.nesting, &1.name})
+
+    Enum.each(added, fn resource ->
+      if MapSet.member?(taken, {resource.nesting, resource.name}) do
+        raise "response schema #{resource.schema_name} would generate " <>
+                "#{inspect(resource.nesting ++ [resource.name])}, which another schema already uses"
+      end
+    end)
   end
 
   defp partition_paths(paths) do
@@ -272,7 +366,8 @@ defmodule Twilio.Generator.OpenAPI do
       operation_id: operation["operationId"],
       tags: operation["tags"] || [],
       request_params: extract_request_params(operation, schemas),
-      query_params: extract_query_params(operation)
+      query_params: extract_query_params(operation),
+      response_schema: response_schema_name(operation)
     }
   end
 
@@ -302,11 +397,7 @@ defmodule Twilio.Generator.OpenAPI do
   end
 
   defp schema_name_from_response(item, method) do
-    response_schema =
-      get_in(item, [method, "responses", "200", "content", "application/json", "schema"]) ||
-        get_in(item, [method, "responses", "201", "content", "application/json", "schema"])
-
-    case response_schema do
+    case response_schema(item[method]) do
       %{"$ref" => ref} ->
         ref_to_name(ref)
 
@@ -318,6 +409,20 @@ defmodule Twilio.Generator.OpenAPI do
 
       _ ->
         nil
+    end
+  end
+
+  defp response_schema(operation) do
+    get_in(operation, ["responses", "200", "content", "application/json", "schema"]) ||
+      get_in(operation, ["responses", "201", "content", "application/json", "schema"])
+  end
+
+  # The schema of a single-object answer. A page answer is an inline object, so
+  # it has no schema name.
+  defp response_schema_name(operation) do
+    case response_schema(operation) do
+      %{"$ref" => ref} -> ref_to_name(ref)
+      _ -> nil
     end
   end
 

@@ -58,12 +58,14 @@ defmodule Mix.Tasks.Twilio.Generate do
   defp generate_all(parsed_specs, dry_run) do
     Enum.reduce(parsed_specs, {0, 0}, fn spec, {svc_count, res_count} ->
       Enum.reduce(spec.resources, {svc_count, res_count}, fn resource, {sc, rc} ->
-        generate_service_file(resource, spec, dry_run)
+        sc = sc + generate_service_file(resource, spec, dry_run)
         rc = rc + generate_resource_file(resource, spec, dry_run)
-        {sc + 1, rc}
+        {sc, rc}
       end)
     end)
   end
+
+  defp generate_service_file(%{response_only: true}, _spec, _dry_run), do: 0
 
   defp generate_service_file(resource, spec, dry_run) do
     nesting = resource[:nesting] || []
@@ -75,6 +77,8 @@ defmodule Mix.Tasks.Twilio.Generate do
       source = ServiceGenerator.generate(resource, spec.product, spec.version, spec.base_url)
       write_file(path, source)
     end
+
+    1
   end
 
   defp generate_resource_file(%{properties: []}, _spec, _dry_run), do: 0

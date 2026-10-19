@@ -89,7 +89,7 @@ defmodule Twilio.Api.V2010.OutgoingCallerIdService do
   | `StatusCallbackMethod` | string (http-method) | The HTTP method we should use to call `status_callback`. Can be: `GET` or `POST`, and the default is `POST`. Values: `GET`, `POST` |
   """
   @spec create(Client.t(), map(), keyword()) ::
-          {:ok, Twilio.Resources.Api.V2010.OutgoingCallerId.t()}
+          {:ok, Twilio.Resources.Api.V2010.ValidationRequest.t()}
           | {:ok, map(), map()}
           | :ok
           | {:error, Twilio.Error.t()}
@@ -104,7 +104,7 @@ defmodule Twilio.Api.V2010.OutgoingCallerIdService do
              base_url: "https://api.twilio.com",
              content_type: :form
            ) do
-      {:ok, Deserializer.deserialize(data, Twilio.Resources.Api.V2010.OutgoingCallerId)}
+      {:ok, Deserializer.deserialize(data, Twilio.Resources.Api.V2010.ValidationRequest)}
     end
   end
 

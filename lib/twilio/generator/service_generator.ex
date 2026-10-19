@@ -18,10 +18,13 @@ defmodule Twilio.Generator.ServiceGenerator do
 
     operations = generate_operations(resource, base_url, resource_mod)
 
+    deserializes =
+      resource_mod != nil or Enum.any?(resource.operations, &Map.has_key?(&1, :response_module))
+
     aliases =
       if has_operations do
         lines = ["  alias Twilio.Client"]
-        lines = if resource_mod, do: lines ++ ["  alias Twilio.Deserializer"], else: lines
+        lines = if deserializes, do: lines ++ ["  alias Twilio.Deserializer"], else: lines
         "\n" <> Enum.join(lines, "\n") <> "\n"
       else
         ""
@@ -74,8 +77,11 @@ defmodule Twilio.Generator.ServiceGenerator do
   defp generate_operations(resource, base_url, resource_mod) do
     sid_param = Map.get(resource, :sid_param)
 
+    # An operation with `:response_module` deserializes its answer into that
+    # resource rather than into the resource of the service.
     Enum.map_join(resource.operations, "\n", fn op ->
-      generate_operation(op, resource, base_url, sid_param, resource_mod)
+      op_mod = Map.get(op, :response_module, resource_mod)
+      generate_operation(op, resource, base_url, sid_param, op_mod)
     end)
   end
 
