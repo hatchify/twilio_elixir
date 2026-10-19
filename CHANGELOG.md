@@ -7,6 +7,36 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.5-hatchify.2] - 2026-10-19
+
+This release is published from the `hatchify/twilio_elixir` fork. It holds
+release 0.1.5-hatchify.1 plus the fix below.
+
+### Fixed
+
+- `Twilio.Api.V2010.KeyService.create/3` now returns
+  `Twilio.Resources.Api.V2010.NewKey`, which holds `secret`. It returned
+  `Twilio.Resources.Api.V2010.Key`, whose struct has no `secret` field, so the
+  deserializer dropped the secret, and Twilio sends the secret only in that
+  answer. The Twilio spec answers `CreateNewKey` with its own schema,
+  `api.v2010.account.new_key`, but the generator deserialized every operation
+  of a service into one resource. The generator now gives an operation the
+  resource of its own answer schema when that schema has a field that the
+  resource of the service lacks. The same fix changes four more functions:
+  - `Twilio.Api.V2010.SigningKeyService.create/3` returns
+    `Twilio.Resources.Api.V2010.NewSigningKey`, which holds `secret`.
+  - `Twilio.Api.V2010.OutgoingCallerIdService.create/3` returns
+    `Twilio.Resources.Api.V2010.ValidationRequest`, which holds
+    `validation_code` and `call_sid`.
+  - `Twilio.Iam.V1.GetApiKeysService.create/3` returns
+    `Twilio.Resources.Iam.V1.NewKey`, which holds `secret`.
+  - `Twilio.Verify.V2.Service.Entity.FactorService.create/5` returns
+    `Twilio.Resources.Verify.V2.Service.Entity.NewFactor`, which holds
+    `binding` and `options`.
+
+  Each of these five functions returns a different struct than before. Code
+  that matches on the old struct must match on the new one.
+
 ## [0.1.5-hatchify.1] - 2026-09-16
 
 This release is published from the `hatchify/twilio_elixir` fork. It holds

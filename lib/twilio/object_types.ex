@@ -99,6 +99,8 @@ defmodule Twilio.ObjectTypes do
       "api.v2010.account.message" => Twilio.Resources.Api.V2010.Message,
       "api.v2010.account.message.media" => Twilio.Resources.Api.V2010.Message.Media,
       "api.v2010.account.message.message_feedback" => Twilio.Resources.Api.V2010.Message.Feedback,
+      "api.v2010.account.new_key" => Twilio.Resources.Api.V2010.NewKey,
+      "api.v2010.account.new_signing_key" => Twilio.Resources.Api.V2010.NewSigningKey,
       "api.v2010.account.notification-instance" => Twilio.Resources.Api.V2010.Notification,
       "api.v2010.account.outgoing_caller_id" => Twilio.Resources.Api.V2010.OutgoingCallerId,
       "api.v2010.account.queue" => Twilio.Resources.Api.V2010.Queue,
@@ -152,6 +154,7 @@ defmodule Twilio.ObjectTypes do
       "api.v2010.account.usage.usage_record.usage_record_yesterday" =>
         Twilio.Resources.Api.V2010.Usage.Record.Yesterday,
       "api.v2010.account.usage.usage_trigger" => Twilio.Resources.Api.V2010.Usage.Trigger,
+      "api.v2010.account.validation_request" => Twilio.Resources.Api.V2010.ValidationRequest,
       "assistants.v1.service.assistant_send_message_response" =>
         Twilio.Resources.Assistants.V1.Assistant.Message,
       "assistants.v1.service.assistant_with_tools_and_knowledge" =>
@@ -309,6 +312,7 @@ defmodule Twilio.ObjectTypes do
       "flex.v2.web_channel" => Twilio.Resources.Flex.V2.WebChannels,
       "frontline.v1.user" => Twilio.Resources.Frontline.V1.User,
       "iam.v1.key" => Twilio.Resources.Iam.V1.GetApiKeys,
+      "iam.v1.new_key" => Twilio.Resources.Iam.V1.NewKey,
       "iam.v1.role_permission" => Twilio.Resources.Iam.V1.Role.Permission,
       "insights.v1.account_settings" => Twilio.Resources.Insights.V1.Voice.Setting,
       "insights.v1.call" => Twilio.Resources.Insights.V1.Voice,
@@ -668,6 +672,8 @@ defmodule Twilio.ObjectTypes do
       "verify.v2.service.entity.challenge.notification" =>
         Twilio.Resources.Verify.V2.Service.Entity.Challenge.Notification,
       "verify.v2.service.entity.factor" => Twilio.Resources.Verify.V2.Service.Entity.Factor,
+      "verify.v2.service.entity.new_factor" =>
+        Twilio.Resources.Verify.V2.Service.Entity.NewFactor,
       "verify.v2.service.messaging_configuration" =>
         Twilio.Resources.Verify.V2.Service.MessagingConfiguration,
       "verify.v2.service.rate_limit" => Twilio.Resources.Verify.V2.Service.RateLimit,

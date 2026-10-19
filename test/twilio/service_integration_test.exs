@@ -1,8 +1,10 @@
 defmodule Twilio.ServiceIntegrationTest do
   use ExUnit.Case, async: true
 
+  alias Twilio.Api.V2010.KeyService
   alias Twilio.Api.V2010.MessageService
   alias Twilio.Resources.Api.V2010.Message
+  alias Twilio.Resources.Api.V2010.NewKey
 
   setup do
     Twilio.Test.stub(fn _method, _url, _headers, _body ->
@@ -117,6 +119,31 @@ defmodule Twilio.ServiceIntegrationTest do
       end)
 
       assert :ok = MessageService.delete(client, "SM789")
+    end
+  end
+
+  describe "KeyService.create/3 deserialization" do
+    test "returns a NewKey struct that keeps the secret", %{client: client} do
+      Twilio.Test.stub(fn "POST", url, _headers, _body ->
+        assert url =~ "/Keys.json"
+
+        body =
+          JSON.encode!(%{
+            "sid" => "SK123",
+            "friendly_name" => "tenant key",
+            "date_created" => "Mon, 13 Jun 2016 22:50:08 +0000",
+            "date_updated" => "Mon, 13 Jun 2016 22:50:08 +0000",
+            "secret" => "foobar"
+          })
+
+        {201, [{"content-type", "application/json"}], body}
+      end)
+
+      assert {:ok, %NewKey{} = key} =
+               KeyService.create(client, %{"FriendlyName" => "tenant key"})
+
+      assert key.sid == "SK123"
+      assert key.secret == "foobar"
     end
   end
 end
