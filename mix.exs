@@ -95,7 +95,7 @@ defmodule Twilio.MixProject do
         ]
       ],
       groups_for_modules: [
-        "Client & Config": [Twilio, Twilio.Client, Twilio.Config],
+        "Client & Config": [Twilio, Twilio.Client, Twilio.Config, Twilio.Download],
         Errors: [Twilio.Error],
         Pagination: [Twilio.Page],
         Webhooks: [Twilio.Webhook],
