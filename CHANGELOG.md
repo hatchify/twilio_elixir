@@ -7,6 +7,30 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.5-hatchify.3] - 2026-11-03
+
+This release is published from the `hatchify/twilio_elixir` fork. It holds
+release 0.1.5-hatchify.2 plus the addition below. No upstream proposal carries
+it: the consumer that needs it is the fork's own.
+
+### Added
+
+- `Twilio.Download.get/3` downloads one media item, such as the `MediaUrl{N}`
+  of an inbound message, which the generated `MediaService` cannot do: it
+  decodes every answer as JSON and returns metadata only. The download returns
+  the status and headers of the answer before any body byte, and the body as a
+  lazy stream that the caller can stop early; `Twilio.Download.cancel/1` stops
+  a download whose body the caller will not read. It follows up to 3 redirects
+  of status 301, 302, 303, 307, or 308, including a relative `Location`, and
+  sends the credentials only to the origin of the first request, because
+  Twilio redirects to a signed URL on another host. Its `:timeout` option is
+  one deadline over the redirects, the headers, and the body. A read error
+  while the body streams raises from the stream. Another final status returns
+  a `Twilio.Error` built from the status and headers only. The download emits
+  no Twilio telemetry event and logs nothing, because the media URL names the
+  media item. Finch's own `[:finch, ...]` events carry the request, so a
+  handler attached to them sees the URL.
+
 ## [0.1.5-hatchify.2] - 2026-10-19
 
 This release is published from the `hatchify/twilio_elixir` fork. It holds

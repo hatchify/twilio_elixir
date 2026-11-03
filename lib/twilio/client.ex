@@ -357,10 +357,8 @@ defmodule Twilio.Client do
   end
 
   defp build_headers(client, method, content_type, max_retries, idempotency_token) do
-    auth = Base.encode64("#{client.username}:#{client.password}")
-
     headers = [
-      {"authorization", "Basic #{auth}"},
+      authorization(client),
       {"user-agent", user_agent(client)},
       {"accept", "application/json"}
     ]
@@ -445,7 +443,15 @@ defmodule Twilio.Client do
     round(base + jitter)
   end
 
-  defp user_agent(client) do
+  @doc false
+  @spec authorization(t()) :: {String.t(), String.t()}
+  def authorization(client) do
+    {"authorization", "Basic " <> Base.encode64("#{client.username}:#{client.password}")}
+  end
+
+  @doc false
+  @spec user_agent(t()) :: String.t()
+  def user_agent(client) do
     base =
       "twilio-elixir/#{Twilio.version()} (#{System.otp_release()}) elixir/#{System.version()}"
 
@@ -455,7 +461,9 @@ defmodule Twilio.Client do
     end
   end
 
-  defp get_header(headers, name) do
+  @doc false
+  @spec get_header([{String.t(), String.t()}], String.t()) :: String.t() | nil
+  def get_header(headers, name) do
     Enum.find_value(headers, fn {k, v} ->
       if String.downcase(k) == name, do: v
     end)

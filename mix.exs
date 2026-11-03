@@ -2,7 +2,7 @@ defmodule Twilio.MixProject do
   use Mix.Project
 
   @source_url "https://github.com/jeffhuen/twilio_elixir"
-  @version "0.1.5-hatchify.2"
+  @version "0.1.5-hatchify.3"
 
   def project do
     [
@@ -95,7 +95,7 @@ defmodule Twilio.MixProject do
         ]
       ],
       groups_for_modules: [
-        "Client & Config": [Twilio, Twilio.Client, Twilio.Config],
+        "Client & Config": [Twilio, Twilio.Client, Twilio.Config, Twilio.Download],
         Errors: [Twilio.Error],
         Pagination: [Twilio.Page],
         Webhooks: [Twilio.Webhook],

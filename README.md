@@ -98,6 +98,19 @@ client
 |> Enum.to_list()
 ```
 
+### Download Media
+
+`Twilio.Download.get/3` streams the bytes of one media item, such as the
+`MediaUrl0` of an inbound message. It follows Twilio's redirect to the signed
+URL and sends the credentials only to the first host.
+
+```elixir
+{:ok, %Twilio.Download{status: 200, headers: headers, body: body}} =
+  Twilio.Download.get(client, media_url, timeout: 30_000)
+
+bytes = Enum.into(body, <<>>)
+```
+
 ## TwiML
 
 Generate TwiML XML for voice and messaging webhooks:
