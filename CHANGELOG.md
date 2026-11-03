@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.5-hatchify.3] - 2026-11-03
+
+This release is published from the `hatchify/twilio_elixir` fork. It holds
+release 0.1.5-hatchify.2 plus the addition below. No upstream proposal carries
+it: the consumer that needs it is the fork's own.
+
 ### Added
 
 - `Twilio.Download.get/3` downloads one media item, such as the `MediaUrl{N}`
